@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?
+  password  String
+  role      Role     @default(PLAYER)
+  createdAt DateTime @default(now())
+
+  player    Player?
+}
+
+model Player {
+  id               String   @id @default(uuid())
+  userId           String?  @unique   // Make optional with ?
+  fullName         String
+  dob              DateTime
+  aadhaarNumber    String?
+  primaryPhone     String
+  alternatePhone   String?
+  bloodGroup       String
+  medicalConditions String?
+  primaryRole      String
+  battingProfile   String?
+  bowlingStyle     String?
+  allRounderType   String?
+  shirtSize        String
+  pantSize         String
+  previousLeagues  String?
+  instagram        String
+  photoUrl         String
+  aadhaarPhotoUrl  String
+  status           PlayerStatus @default(PENDING)
+  createdAt        DateTime     @default(now())
+
+  user             User?    @relation(fields: [userId], references: [id])  // Optional relation
+}
+
+enum Role {
+  ADMIN
+  PLAYER
+}
+
+enum PlayerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

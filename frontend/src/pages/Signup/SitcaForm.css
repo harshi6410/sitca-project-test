@@ -1,0 +1,286 @@
+/* SitcaForm.css - Crimson Theme with Form Validation Styling */
+
+.sitca-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f18, #1a0000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sitca-card {
+  background: rgba(20, 10, 15, 0.7);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  padding: 50px 60px;
+  width: 100%;
+  max-width: 720px;
+  box-shadow:
+    0 15px 50px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(177, 18, 18, 0.3);
+  border: 1px solid rgba(177, 18, 18, 0.3);
+}
+
+.sitca-title {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #ff3333, #b11212, #ff3333);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.sitca-subtitle {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 40px;
+}
+
+.form-label {
+  display: block;
+  color: #ff6666;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: #ff6666;
+}
+
+/* Input Fields - Base Style */
+.input-field,
+.select-field,
+.textarea-field {
+  width: 100%;
+  padding: 18px 22px;
+  background: rgba(30, 10, 20, 0.6);
+  border: 2px solid rgba(177, 18, 18, 0.4);
+  border-radius: 18px;
+  color: white;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+}
+
+.input-field::placeholder,
+.textarea-field::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Focus State */
+.input-field:focus,
+.select-field:focus,
+.textarea-field:focus {
+  border-color: #b11212;
+  background: rgba(40, 15, 25, 0.7);
+  box-shadow: 0 0 0 4px rgba(177, 18, 18, 0.3);
+  transform: translateY(-2px);
+}
+
+/* VALID State - Green Glow */
+.input-field:valid:focus,
+.select-field:valid:focus,
+.textarea-field:valid:focus,
+.input-field:not(:placeholder-shown):valid,
+.select-field:valid,
+.textarea-field:not(:empty):valid {
+  border-color: #0f5132;
+  background: rgba(15, 40, 15, 0.6);
+  box-shadow: 0 0 0 4px rgba(15, 81, 50, 0.4);
+}
+
+/* INVALID State - Red Glow */
+.input-field:invalid:focus,
+.input-field:not(:placeholder-shown):invalid,
+.select-field:invalid,
+.textarea-field:not(:empty):invalid {
+  border-color: #8b0000;
+  background: rgba(50, 10, 10, 0.6);
+  box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.4);
+  animation: shake 0.3s ease-in-out;
+}
+
+/* File Input Validation */
+.file-input:invalid {
+  border-color: #8b0000;
+  background: rgba(50, 10, 10, 0.6);
+  box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.4);
+}
+
+.file-input:valid {
+  border-color: #0f5132;
+  background: rgba(15, 40, 15, 0.6);
+  box-shadow: 0 0 0 4px rgba(15, 81, 50, 0.4);
+}
+
+/* Shake Animation for Invalid */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+/* Select Dropdown */
+.select-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23b11212' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 16px;
+}
+
+/* File Input */
+.file-input {
+  width: 100%;
+  padding: 20px;
+  background: rgba(30, 10, 20, 0.6);
+  border: 2px dashed rgba(177, 18, 18, 0.5);
+  border-radius: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+}
+
+.file-input:hover {
+  border-color: #b11212;
+  background: rgba(40, 15, 25, 0.7);
+  transform: translateY(-2px);
+}
+
+.file-name {
+  color: #ff6666;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Radio Groups */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.radio-item input[type="radio"] {
+  accent-color: #b11212;
+  margin-right: 12px;
+  transform: scale(1.3);
+}
+
+/* Declaration */
+.declaration-box {
+  background: rgba(30, 10, 20, 0.5);
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(177, 18, 18, 0.4);
+  margin: 30px 0;
+  backdrop-filter: blur(10px);
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 15px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  accent-color: #b11212;
+  margin-right: 12px;
+  margin-top: 4px;
+  transform: scale(1.3);
+}
+
+.checkbox-item input[type="checkbox"]:invalid ~ span {
+  color: #ff6666;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #b11212, #ff3333);
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 30px;
+  transition: all 0.4s ease;
+  box-shadow: 0 12px 35px rgba(177, 18, 18, 0.5);
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(177, 18, 18, 0.6);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Support Text */
+.support-text {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin-top: 30px;
+}
+
+.support-text a {
+  color: #ff6666;
+  text-decoration: underline;
+}
+
+/* Message Display */
+div[style*="background: rgba(0, 150, 0"] {
+  border: 1px solid #0f5132;
+}
+
+div[style*="background: rgba(150, 0, 0"] {
+  border: 1px solid #8b0000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sitca-card {
+    padding: 40px 30px;
+    margin: 20px;
+  }
+
+  .sitca-title {
+    font-size: 34px;
+  }
+
+  .sitca-subtitle {
+    font-size: 18px;
+  }
+
+  .input-field, .textarea-field, .file-input {
+    padding: 16px;
+  }
+}
