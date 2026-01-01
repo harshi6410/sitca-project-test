@@ -2,7 +2,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
+
+// ✅ Load .env ONLY in local development
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
 // ==================== IMPORT ROUTES ====================
 const authRoutes = require("./routes/auth.routes");
@@ -11,26 +15,27 @@ const playerRoutes = require("./routes/player.routes");
 
 const app = express();
 
-// ==================== TRUST PROXY (IMPORTANT FOR RAILWAY) ====================
+// ==================== TRUST PROXY (RAILWAY REQUIRED) ====================
 app.set("trust proxy", 1);
 
 // ==================== CORS CONFIG ====================
 const allowedOrigins = [
-  "http://localhost:5173",               // Dev
-  process.env.CLIENT_URL                 // Prod (Vercel)
-].filter(Boolean); // remove undefined
+  "http://localhost:5173", // Dev
+  process.env.CLIENT_URL   // Prod (Vercel)
+].filter(Boolean);
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow REST tools (Postman, curl)
+    origin: (origin, callback) => {
+      // Allow Postman / server-to-server
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      // ❌ Instead of crashing server, return controlled error
+      return callback(null, false);
     },
     credentials: true
   })
@@ -73,7 +78,7 @@ app.use((req, res) => {
 
 // ==================== GLOBAL ERROR HANDLER ====================
 app.use((err, req, res, next) => {
-  console.error("❌ Error:", err.message);
+  console.error("❌ SERVER ERROR:", err);
 
   res.status(500).json({
     error: "Internal Server Error",
