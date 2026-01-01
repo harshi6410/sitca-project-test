@@ -1,3 +1,10 @@
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const prisma = require("../prismaClient");
+
+const router = express.Router(); // ✅ THIS WAS MISSING
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -15,7 +22,7 @@ router.post("/login", async (req, res) => {
       where: { email }
     });
 
-    // ❗ Do NOT reveal which field is wrong
+    // Security best practice
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -44,3 +51,5 @@ router.post("/login", async (req, res) => {
     return res.status(500).json({ message: "Login failed" });
   }
 });
+
+module.exports = router;
