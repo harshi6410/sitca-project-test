@@ -19,7 +19,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+      const API_BASE = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, "");
 
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
