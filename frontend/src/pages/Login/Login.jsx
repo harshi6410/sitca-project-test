@@ -19,32 +19,38 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {  // Uses proxy — no hardcoded localhost
+      const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
 
       if (!res.ok) {
         setError(data.message || "Login failed. Please check your credentials.");
-        setLoading(false);
         return;
       }
 
-      // Store token and role
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.user.role);
 
-      // Redirect to intended page or dashboard
       const from = location.state?.from?.pathname || "/dashboard";
       navigate(from, { replace: true });
     } catch (err) {
       console.error("Login error:", err);
       setError("Server not reachable. Please try again later.");
+    } finally {
       setLoading(false);
     }
   };
