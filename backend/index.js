@@ -3,24 +3,15 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// ==================== PRISMA ====================
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-
-// ==================== DB CONNECTION TEST ====================
-(async function testDbConnection() {
-  try {
-    await prisma.$connect();
-    console.log("✅ Prisma connected to PostgreSQL");
-  } catch (error) {
-    console.error("❌ Prisma DB connection failed:", error);
-  }
-})();
-
-// ✅ Load .env ONLY in local development
+// ==================== LOAD ENV ====================
+// Load .env ONLY in local development
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
+
+// ==================== PRISMA ====================
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 // ==================== IMPORT ROUTES ====================
 const authRoutes = require("./routes/auth.routes");
@@ -32,22 +23,28 @@ const app = express();
 // ==================== TRUST PROXY ====================
 app.set("trust proxy", 1);
 
-// ==================== CORS CONFIG ====================
+// ==================== CORS CONFIG (FIXED) ====================
+// IMPORTANT: frontend origin must match EXACTLY
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL
-].filter(Boolean);
+  "https://sitca-project-test.vercel.app"
+];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
+    origin: function (origin, callback) {
+      // Allow Postman / curl
       if (!origin) return callback(null, true);
+
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-      return callback(null, false);
+
+      return callback(new Error("CORS blocked: " + origin));
     },
-    credentials: true
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+    // ❌ DO NOT enable credentials (you are not using cookies)
   })
 );
 
@@ -64,27 +61,18 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/player", playerRoutes);
 
 // ==================== HEALTH CHECK ====================
-app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    service: "SITCA Backend API",
-    environment: process.env.NODE_ENV || "development",
-    timestamp: new Date().toISOString()
-  });
-});
-
-// ==================== DATABASE TEST ====================
-app.get("/api/db-test", async (req, res) => {
+app.get("/api/health", async (req, res) => {
   try {
-    const userCount = await prisma.user.count();
+    await prisma.$queryRaw`SELECT 1`;
     res.status(200).json({
-      status: "Database connected successfully",
-      userCount
+      status: "OK",
+      service: "SITCA Backend API",
+      environment: process.env.NODE_ENV || "development",
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error("❌ DB TEST ERROR:", error);
     res.status(500).json({
-      status: "Database connection failed",
+      status: "DB NOT CONNECTED",
       error: error.message
     });
   }
@@ -105,7 +93,8 @@ app.use((req, res) => {
 
 // ==================== GLOBAL ERROR HANDLER ====================
 app.use((err, req, res, next) => {
-  console.error("❌ SERVER ERROR:", err);
+  console.error("❌ SERVER ERROR:", err.message);
+
   res.status(500).json({
     error: "Internal Server Error",
     message:
