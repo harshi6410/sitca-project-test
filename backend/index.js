@@ -3,6 +3,20 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
+// ==================== PRISMA ====================
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+// ==================== DB CONNECTION TEST ====================
+(async function testDbConnection() {
+  try {
+    await prisma.$connect();
+    console.log("✅ Prisma connected to PostgreSQL");
+  } catch (error) {
+    console.error("❌ Prisma DB connection failed:", error);
+  }
+})();
+
 // ✅ Load .env ONLY in local development
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -15,26 +29,22 @@ const playerRoutes = require("./routes/player.routes");
 
 const app = express();
 
-// ==================== TRUST PROXY (RAILWAY REQUIRED) ====================
+// ==================== TRUST PROXY ====================
 app.set("trust proxy", 1);
 
 // ==================== CORS CONFIG ====================
 const allowedOrigins = [
-  "http://localhost:5173", // Dev
-  process.env.CLIENT_URL   // Prod (Vercel)
+  "http://localhost:5173",
+  process.env.CLIENT_URL
 ].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow Postman / server-to-server
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
-
-      // ❌ Instead of crashing server, return controlled error
       return callback(null, false);
     },
     credentials: true
@@ -63,6 +73,23 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// ==================== DATABASE TEST ====================
+app.get("/api/db-test", async (req, res) => {
+  try {
+    const userCount = await prisma.user.count();
+    res.status(200).json({
+      status: "Database connected successfully",
+      userCount
+    });
+  } catch (error) {
+    console.error("❌ DB TEST ERROR:", error);
+    res.status(500).json({
+      status: "Database connection failed",
+      error: error.message
+    });
+  }
+});
+
 // ==================== ROOT ====================
 app.get("/", (req, res) => {
   res.json({
@@ -79,7 +106,6 @@ app.use((req, res) => {
 // ==================== GLOBAL ERROR HANDLER ====================
 app.use((err, req, res, next) => {
   console.error("❌ SERVER ERROR:", err);
-
   res.status(500).json({
     error: "Internal Server Error",
     message:
