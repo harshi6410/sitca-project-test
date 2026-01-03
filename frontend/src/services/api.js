@@ -17,5 +17,5 @@ export const apiRequest = async (url, options = {}) => {
     throw new Error(err.message || "API Error");
   }
 
-  return res.json();
+  return res.json();  
 };

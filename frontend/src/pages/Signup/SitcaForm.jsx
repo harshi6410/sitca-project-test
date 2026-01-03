@@ -1,4 +1,3 @@
-// SitcaForm.jsx
 import React, { useState } from "react";
 import "./SitcaForm.css";
 
@@ -12,10 +11,10 @@ const SitcaForm = () => {
     alternatePhone: "",
     bloodGroup: "",
     medicalConditions: "",
-    primaryRole: "",              // Batsman, Bowler, All-Rounder
-    battingProfile: "",           // Righthand Batsman, Lefthand Batsman, Wicketkeeper
+    primaryRole: "",
+    battingProfile: "",
     bowlingStyle: "",
-    allRounderType: "",           // Batting/Bowling/Wicketkeeper All-Rounder
+    allRounderType: "",
     shirtSize: "Medium",
     pantSize: "",
     previousLeagues: "",
@@ -37,7 +36,7 @@ const SitcaForm = () => {
   };
 
   const handleFile = (e, setter) => {
-    if (e.target.files[0]) {
+    if (e.target.files?.[0]) {
       setter(e.target.files[0]);
     }
   };
@@ -54,7 +53,6 @@ const SitcaForm = () => {
     }
 
     const formDataToSend = new FormData();
-
     // Append all text fields
     formDataToSend.append("fullName", formData.fullName);
     formDataToSend.append("email", formData.email);
@@ -78,17 +76,29 @@ const SitcaForm = () => {
     if (aadhaarPhoto) formDataToSend.append("aadhaarPhoto", aadhaarPhoto);
 
     try {
-      const res = await fetch("http://localhost:5000/api/player/register-public", {
+      // Use environment variable in production / localhost fallback
+      const API_BASE = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:5000";
+
+      const res = await fetch(`${API_BASE}/api/player/register-public`, {
         method: "POST",
+        mode: "cors",           // ← Crucial for CORS in most modern deployments
+        credentials: "omit",    // ← Recommended when not using cookies/sessions
         body: formDataToSend,
+        // Important: Do NOT set "Content-Type" manually with FormData
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = { message: "No response body" };
+      }
 
       if (res.ok) {
         setMessage("Registration successful! Your details are pending admin approval.");
         alert("Thank you! Your registration has been submitted successfully.");
-        // Optional: Reset form
+
+        // Reset form
         setFormData({
           fullName: "",
           email: "",
@@ -130,18 +140,19 @@ const SitcaForm = () => {
         <p className="sitca-subtitle">Player Registration Form</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
           {/* Message Display */}
           {message && (
-            <div style={{
-              padding: "16px",
-              borderRadius: "12px",
-              background: message.includes("successful") ? "rgba(0, 150, 0, 0.2)" : "rgba(150, 0, 0, 0.2)",
-              color: message.includes("successful") ? "#90ee90" : "#ff9999",
-              textAlign: "center",
-              fontWeight: "600",
-              marginBottom: "20px"
-            }}>
+            <div
+              style={{
+                padding: "16px",
+                borderRadius: "12px",
+                background: message.includes("successful") ? "rgba(0, 150, 0, 0.2)" : "rgba(150, 0, 0, 0.2)",
+                color: message.includes("successful") ? "#90ee90" : "#ff9999",
+                textAlign: "center",
+                fontWeight: "600",
+                marginBottom: "20px",
+              }}
+            >
               {message}
             </div>
           )}
@@ -358,7 +369,6 @@ const SitcaForm = () => {
             Facing issues? Contact{" "}
             <a href="mailto:support@southindiat10.com">support@southindiat10.com</a>
           </p>
-
         </form>
       </div>
     </div>
